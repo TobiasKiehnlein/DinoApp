@@ -1,0 +1,9 @@
+.active {
+  color: var(--ion-color-primary);
+  -webkit-filter: drop-shadow(0 0 5px var(--ion-color-primary-tint));
+  filter: drop-shadow(0 0 5px var(--ion-color-primary-tint));
+}
+
+.inactive {
+  color: var(--ion-color-medium);
+}
