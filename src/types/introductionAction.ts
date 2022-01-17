@@ -9,6 +9,7 @@ export default interface IntroductionAction extends Action {
 		type: 'DINO' | 'SERVER' | 'APP';
 		currentState: boolean;
 		currentMode: Mode;
-		availableModes: Mode[]; //TODO replace with mode
+		availableModes: Mode[];
+		possibleModes: Mode[];
 	}
 }

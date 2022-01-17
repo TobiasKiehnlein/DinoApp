@@ -7,14 +7,15 @@ import Mode from '../types/mode';
 
 export default class WebsocketHandler {
 	public static introduction?: IntroductionAction;
-	private static _websocket: WebSocket;
+	private static _websocket?: WebSocket;
 	public static get websocket(): WebSocket {
 		if (!this._websocket) {
 			const token = localStorage.getItem(GLOBAL_STATE_IDENTIFIER.TOKEN)?.replace(/[^a-z0-9-]/gmi, '');
-			this._websocket = new WebSocket('wss://dino.petrusbellmonte.de', [ token ?? '', 'dino' ]);
+			this._websocket = new WebSocket('wss://dino.petrusbellmonte.de', [ token ?? 'no-token', 'dino' ]);
+			console.log(token);
 			this._websocket.onopen = () => {
 				console.log('socket opened...');
-				this._websocket.send(JSON.stringify({
+				this._websocket?.send(JSON.stringify({
 					type: ACTION_TYPE.INTRODUCTION, args: {
 						name: localStorage.getItem(GLOBAL_STATE_IDENTIFIER.USERNAME),
 						type: 'APP'
@@ -24,6 +25,9 @@ export default class WebsocketHandler {
 			this._websocket.onerror = (evt) => {
 				console.log(evt);
 			};
+			this._websocket.onclose = ev =>  {
+				this._websocket = undefined;
+			}
 			this._websocket.onmessage = (msg) => {
 				try {
 					const data: Action = JSON.parse(msg.data);
@@ -36,14 +40,14 @@ export default class WebsocketHandler {
 								this.triggerListenersByType({ ...data, type: ACTION_TYPE.SET_STATE, args: { newState: data.args.currentState } });
 								document.dispatchEvent(new CustomEvent<Mode[]>(GLOBAL_STATE_IDENTIFIER.AVAILABLE_MODES, { detail: this.introduction.args.availableModes }));
 							} else if (this.introduction) {
+								console.log('wtf')
 								const currentModeTypes = this.introduction.args.availableModes.map(mode => mode.type);
-								this.introduction.args.availableModes =
-									[
-										...this.introduction.args.availableModes,
-										...introduction.args.availableModes.filter(mode => !currentModeTypes.includes(mode.type))
-									];
+								this.introduction.args.availableModes=[...this.introduction.args.availableModes, ...(introduction.args.availableModes??introduction.args.possibleModes??[]).filter(mode => !currentModeTypes.includes(mode.type))];
+								console.log(`updating available modes... Now: ${JSON.stringify(this.introduction.args.availableModes)}`)
 								document.dispatchEvent(new CustomEvent<Mode[]>(GLOBAL_STATE_IDENTIFIER.AVAILABLE_MODES, { detail: this.introduction.args.availableModes }));
 								this.triggerListenersByType(data);
+							} else {
+								console.log('weird shit')
 							}
 							break;
 						case ACTION_TYPE.SET_MODE:
@@ -55,6 +59,7 @@ export default class WebsocketHandler {
 							throw new Error(data.args.message);
 					}
 				} catch (e) {
+					console.warn(e)
 					document.dispatchEvent(new CustomEvent<string>(GLOBAL_STATE_IDENTIFIER.ERROR, { detail: e.msg }));
 				}
 			};
@@ -95,8 +100,8 @@ export const useWebsocket = <T>(actionType: ACTION_TYPE): [ T | null, (args: any
 		};
 	}, [ actionType ]);
 	
-	const setActionArgs = (args: any) => {
-		WebsocketHandler.websocket.send(JSON.stringify({ origin: localStorage.getItem(GLOBAL_STATE_IDENTIFIER.USERNAME), totalBroadcast: true, type: actionType, args } as Action));
+	const setActionArgs = (args: any, address = 'ALL') => {
+		WebsocketHandler.websocket.send(JSON.stringify({ origin: JSON.parse(localStorage.getItem(GLOBAL_STATE_IDENTIFIER.USERNAME)??''), type: actionType, address, args } as unknown as Action));
 	};
 	
 	return [ value as T | null, setActionArgs ];

@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import GLOBAL_STATE_IDENTIFIER from '../enums/globalStateIdentifier';
 
 const useGlobalState = <T>(identifier: GLOBAL_STATE_IDENTIFIER, defaultValue?: any): [ T, (newState: T) => void ] => {
-	const [ state, setState ] = useState<T>(JSON.parse(localStorage.getItem(identifier) ?? 'null') ?? defaultValue);
+	const [ value, setValue ] = useState<T>(JSON.parse(localStorage.getItem(identifier) ?? 'null') ?? defaultValue);
 	
 	const customSetState = (newState: T) => {
 		localStorage.setItem(identifier, JSON.stringify(newState));
@@ -10,9 +10,17 @@ const useGlobalState = <T>(identifier: GLOBAL_STATE_IDENTIFIER, defaultValue?: a
 		document.dispatchEvent(event);
 	};
 	
-	document.addEventListener(identifier, evt => setState((evt as CustomEvent).detail));
+	useEffect(() => {
+		const listener=(evt: any)=> {
+			setValue((evt as CustomEvent).detail);
+			console.log('update modes' + JSON.stringify((evt as CustomEvent).detail));
+		}
+		
+		document.addEventListener(identifier, listener);
+		return () => document.removeEventListener(identifier, listener);
+	}, []);
 	
-	return [ state, customSetState ];
+	return [ value, customSetState ];
 };
 
 export default useGlobalState;

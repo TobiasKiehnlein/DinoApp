@@ -1,6 +1,10 @@
-import { IonApp, IonRouterOutlet, IonSplitPane } from '@ionic/react';
+import { IonApp, IonRouterOutlet, IonSplitPane, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Route } from 'react-router-dom';
+import Settings from './pages/Settings';
+import Dino from './pages/Dino';
+import Greeting from './components/Greeting';
+import React from 'react';
 import Menu from './components/Menu';
 
 /* Core CSS required for Ionic components to work properly */
@@ -21,9 +25,10 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.scss';
-import Settings from './pages/Settings';
-import Dino from './pages/Dino';
-import Greeting from './components/Greeting';
+
+setupIonicReact({
+
+});
 
 const App: React.FC = () => {
 	return (
