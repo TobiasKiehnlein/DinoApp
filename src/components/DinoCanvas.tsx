@@ -86,9 +86,9 @@ const DinoCanvas: React.FC = () => {
 	return (
 		<Canvas style={ { height: 'min(40vh, 500px)' } } linear id={ 'dino-canvas' }>
 			<Suspense fallback={ <Loader/> }>
-				<Bloom>
+				{/*<Bloom>*/}
 					<DinoCanvasContent/>
-				</Bloom>
+				{/*</Bloom>*/}
 				<OrbitControls autoRotate enableZoom={ false } enablePan={ false }/>
 			</Suspense>
 		</Canvas>

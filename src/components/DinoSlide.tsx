@@ -34,7 +34,15 @@ export const DinoSlide: React.FC<{ mode: Mode }> = ({ mode: m }) => {
 			<h1>{ m.name }</h1>
 			<p>{ m.description }</p>
 			{ params.map(([ key, param ]) => renderParam(key, param)) }
-			<IonButton onClick={ () => setMode({ newMode: { ...m, params: params.reduce((prev: any, [ key, value ]) => prev[key] = value, {}) } }) }>Apply</IonButton>
+			<IonButton onClick={ () => {
+				const newParams = params.reduce((prev: any, [ key, value ]) => {
+					prev[key] = value;
+					return prev;
+				}, {});
+				console.log(params);
+				console.log(newParams);
+				setMode({ newMode: { ...m, params: newParams } });
+			} }>Apply</IonButton>
 		</>
 	);
 };
