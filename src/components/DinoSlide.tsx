@@ -23,7 +23,7 @@ export const DinoSlide: React.FC<{ mode: Mode }> = ({ mode: m }) => {
 			<IonItem key={ paramId }>
 				<IonLabel>{ param.name }</IonLabel>
 				<input type={ param.type === MODE_TYPE.NUMBER ? 'number' : 'color' } value={ param.value ?? param.defaultValue } onChange={ val => {
-					setParams(current => current.map(([ key, param ]) => key === paramId ? [ key, { ...param, value: val.target.value } ] : [ key, param ]));
+					setParams(current => current.map(([ key, param ]) => key === paramId ? [ key, { ...param, value: param.type === MODE_TYPE.NUMBER ? Number(val.target.value) : val.target.value } ] : [ key, param ]));
 				} }/>
 			</IonItem>
 		);
