@@ -38,15 +38,15 @@ export function DinoSlides() {
 			<IonButton onClick={ () => setMode({ newMode: m }) }>Apply</IonButton>
 		</SwiperSlide>);
 	
-	return (
-		<Swiper
-			spaceBetween={ 50 }
-			loop
-			navigation
-			pagination
-			id='dino-slides'
-		>
-			{ modes?.map(m => <SwiperSlide key={ m.type }><DinoSlide key={ m.type } mode={ m }/></SwiperSlide>) }
-		</Swiper>
+	return ((modes?.length ?? 0) > 0 ?
+			<Swiper
+				spaceBetween={ 50 }
+				loop
+				navigation
+				pagination
+				id='dino-slides'
+			>
+				{ modes?.map(m => <SwiperSlide key={ m.type }><DinoSlide key={ m.type } mode={ m }/></SwiperSlide>) }
+			</Swiper> : <IonLabel style={{textAlign:'center', display: 'block'}} color='medium'>No modes available. Make sure a Dino is connected!</IonLabel>
 	);
 }
