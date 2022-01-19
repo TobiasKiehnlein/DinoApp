@@ -7,8 +7,7 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 
-import './DinoCanvas.scss'
-import { Euler } from 'three';
+import './DinoCanvas.scss';
 
 extend({ EffectComposer, RenderPass, UnrealBloomPass });
 
@@ -29,7 +28,7 @@ function Dino(props: JSX.IntrinsicElements['mesh']) {
 			scale={ 0.0008 }
 			onPointerOver={ (event) => hover(true) }
 			onPointerOut={ (event) => hover(false) }>
-			<primitive object={ geom } />
+			<primitive object={ geom }/>
 			{/*<boxGeometry args={ [ 1, 1, 1 ] }/>*/ }
 			<meshPhongMaterial color='green' opacity={ 0.1 } transparent/>
 		</mesh>
@@ -40,7 +39,7 @@ function deg2rad(deg: number) {
 	return deg * (Math.PI / 180);
 }
 
-const Bloom: FC = ({ children }) => {
+const Bloom: FC<{ active?: boolean }> = ({ children, active }) => {
 	const { gl, camera, size } = useThree();
 	const [ scene, setScene ] = useState();
 	const composer = useRef<ReactNode>(null);
@@ -71,12 +70,12 @@ const DinoCanvasContent: React.FC = () => {
 	return (
 		<>
 			<ambientLight/>
-			<pointLight position={ [ 10, 10, 10 ] } />
-			{/*<pointLight position={ [ 0, 0, 0 ] } color={ 'red' } intensity={ 10 }/>*/}
-			{/*<mesh position={ [ 0, 0, 0 ] }>*/}
-			{/*	<boxGeometry args={ [ .1, .1, .1 ] }/>*/}
-			{/*	<meshStandardMaterial color={ 'hotpink' }/>*/}
-			{/*</mesh>*/}
+			<pointLight position={ [ 10, 10, 10 ] }/>
+			{/*<pointLight position={ [ 0, 0, 0 ] } color={ 'red' } intensity={ 10 }/>*/ }
+			{/*<mesh position={ [ 0, 0, 0 ] }>*/ }
+			{/*	<boxGeometry args={ [ .1, .1, .1 ] }/>*/ }
+			{/*	<meshStandardMaterial color={ 'hotpink' }/>*/ }
+			{/*</mesh>*/ }
 			<Dino position={ [ 0, -2, 0 ] }/>
 		</>
 	);
@@ -85,12 +84,12 @@ const DinoCanvasContent: React.FC = () => {
 const DinoCanvas: React.FC = () => {
 	
 	return (
-		<Canvas style={ { height: 'min(40vh, 500px)' } } linear id={'dino-canvas'}>
+		<Canvas style={ { height: 'min(40vh, 500px)' } } linear id={ 'dino-canvas' }>
 			<Suspense fallback={ <Loader/> }>
-				{/*<Bloom>*/}
+				<Bloom>
 					<DinoCanvasContent/>
-				{/*</Bloom>*/}
-				<OrbitControls autoRotate enableZoom={false} enablePan={false}/>
+				</Bloom>
+				<OrbitControls autoRotate enableZoom={ false } enablePan={ false }/>
 			</Suspense>
 		</Canvas>
 	);

@@ -8,6 +8,8 @@ import Mode from '../types/mode';
 export default class WebsocketHandler {
 	public static introduction?: IntroductionAction;
 	private static _websocket?: WebSocket;
+	public static myOrigin = Math.random().toString().replace(/^../, '');
+	
 	public static get websocket(): WebSocket {
 		if (!this._websocket) {
 			const token = localStorage.getItem(GLOBAL_STATE_IDENTIFIER.TOKEN)?.replace(/[^a-z0-9-]/gmi, '');
@@ -16,7 +18,9 @@ export default class WebsocketHandler {
 			this._websocket.onopen = () => {
 				console.log('socket opened...');
 				this._websocket?.send(JSON.stringify({
-					type: ACTION_TYPE.INTRODUCTION, args: {
+					origin: this.myOrigin,
+					type: ACTION_TYPE.INTRODUCTION,
+					args: {
 						name: localStorage.getItem(GLOBAL_STATE_IDENTIFIER.USERNAME),
 						type: 'APP'
 					}
@@ -25,9 +29,9 @@ export default class WebsocketHandler {
 			this._websocket.onerror = (evt) => {
 				console.log(evt);
 			};
-			this._websocket.onclose = ev =>  {
+			this._websocket.onclose = ev => {
 				this._websocket = undefined;
-			}
+			};
 			this._websocket.onmessage = (msg) => {
 				try {
 					const data: Action = JSON.parse(msg.data);
@@ -40,14 +44,14 @@ export default class WebsocketHandler {
 								this.triggerListenersByType({ ...data, type: ACTION_TYPE.SET_STATE, args: { newState: data.args.currentState } });
 								document.dispatchEvent(new CustomEvent<Mode[]>(GLOBAL_STATE_IDENTIFIER.AVAILABLE_MODES, { detail: this.introduction.args.availableModes }));
 							} else if (this.introduction) {
-								console.log('wtf')
+								console.log('wtf');
 								const currentModeTypes = this.introduction.args.availableModes.map(mode => mode.type);
-								this.introduction.args.availableModes=[...this.introduction.args.availableModes, ...(introduction.args.availableModes??introduction.args.possibleModes??[]).filter(mode => !currentModeTypes.includes(mode.type))];
-								console.log(`updating available modes... Now: ${JSON.stringify(this.introduction.args.availableModes)}`)
+								this.introduction.args.availableModes = [ ...this.introduction.args.availableModes, ...(introduction.args.availableModes ?? introduction.args.possibleModes ?? []).filter(mode => !currentModeTypes.includes(mode.type)) ];
+								console.log(`updating available modes... Now: ${ JSON.stringify(this.introduction.args.availableModes) }`);
 								document.dispatchEvent(new CustomEvent<Mode[]>(GLOBAL_STATE_IDENTIFIER.AVAILABLE_MODES, { detail: this.introduction.args.availableModes }));
 								this.triggerListenersByType(data);
 							} else {
-								console.log('weird shit')
+								console.log('weird shit');
 							}
 							break;
 						case ACTION_TYPE.SET_MODE:
@@ -59,7 +63,7 @@ export default class WebsocketHandler {
 							throw new Error(data.args.message);
 					}
 				} catch (e) {
-					console.warn(e)
+					console.warn(e);
 					document.dispatchEvent(new CustomEvent<string>(GLOBAL_STATE_IDENTIFIER.ERROR, { detail: e.msg }));
 				}
 			};
@@ -88,11 +92,11 @@ export default class WebsocketHandler {
 }
 
 export const useWebsocket = <T>(actionType: ACTION_TYPE): [ T | null, (args: any) => void ] => {
-	const [ value, setValue ] = useState<Action | null>(JSON.parse(localStorage.getItem(`LAST_${ actionType }`) ?? 'null'));
+	const [ value, setValue ] = useState<Action | null>((window as any)[`LAST_${ actionType }`] as Action ?? null);
 	
 	useEffect(() => {
 		const listenerId = WebsocketHandler.addListener(actionType, v => {
-			localStorage.setItem(`LAST_${ actionType }`, JSON.stringify(v));
+			(window as any)[`LAST_${ actionType }`] = v;
 			setValue(v);
 		});
 		return () => {
@@ -101,7 +105,7 @@ export const useWebsocket = <T>(actionType: ACTION_TYPE): [ T | null, (args: any
 	}, [ actionType ]);
 	
 	const setActionArgs = (args: any, address = 'ALL') => {
-		WebsocketHandler.websocket.send(JSON.stringify({ origin: JSON.parse(localStorage.getItem(GLOBAL_STATE_IDENTIFIER.USERNAME)??''), type: actionType, address, args } as unknown as Action));
+		WebsocketHandler.websocket.send(JSON.stringify({ origin: WebsocketHandler.myOrigin, type: actionType, address, args } as unknown as Action));
 	};
 	
 	return [ value as T | null, setActionArgs ];

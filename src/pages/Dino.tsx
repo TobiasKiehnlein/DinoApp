@@ -1,11 +1,8 @@
 import { IonContent, IonPage } from '@ionic/react';
 import './Page.scss';
 import Header from '../components/Header';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import DinoCanvas from '../components/DinoCanvas';
-import Mode from '../types/mode';
-import { useWebsocket } from '../hooks/websocketHooks';
-import ACTION_TYPE from '../enums/actionType';
 import { DinoSlides } from '../components/DinoSlides';
 
 // Optional parameters to pass to the swiper instance.

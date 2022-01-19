@@ -1,5 +1,14 @@
 import MODE_TYPE from '../enums/modeType';
 
+export interface ModeParam {
+	name: string,
+	description: string,
+	type: MODE_TYPE,
+	unit?: string,
+	defaultValue?: string | number,
+	value?: string | number
+}
+
 export default interface Mode {
 	/**
 	 * mode name/id
@@ -14,13 +23,6 @@ export default interface Mode {
 	 */
 	description: string,
 	params: {
-		[paramType: string]: {
-			name: string,
-			description: string,
-			type: MODE_TYPE,
-			unit?: string,
-			defaultValue?: string | number,
-			value?: string | number
-		}
+		[paramType: string]: ModeParam
 	}
 }
