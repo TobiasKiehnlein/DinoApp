@@ -13,7 +13,7 @@ const Greeting: React.FC<Props> = () => {
 	const [ toastVisible, setToastVisible ] = useState<string>();
 	
 	useEffect(() => {
-		if (action?.origin /*&& action.origin.toLowerCase() !== 'server'*/) {
+		if (action?.origin /*&& action.origin.toLowerCase() !== 'server'*/ && !action.cached) {
 			setToastVisible(`${ action?.args.name ?? 'A new device' } connected!`);
 			
 			setTimeout(() => setToastVisible(undefined), 4000);

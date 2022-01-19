@@ -5,6 +5,7 @@ import Header from '../components/Header';
 import React from 'react';
 import useGlobalState from '../hooks/globalState';
 import GLOBAL_STATE_IDENTIFIER from '../enums/globalStateIdentifier';
+import WebsocketHandler from '../hooks/websocketHooks';
 
 const Page: React.FC = () => {
 	
@@ -24,7 +25,13 @@ const Page: React.FC = () => {
 					</IonItem>
 					<IonItem>
 						<IonLabel position='floating'>Token</IonLabel>
-						<IonInput type='password' name='token' value={ token } onIonChange={ evt => setToken(evt.detail.value ?? '') }/>
+						<IonInput type='password' name='token' value={ token } onIonChange={ evt => {
+							setToken(evt.detail.value ?? '');
+							try {
+								const updateSocket = WebsocketHandler.websocket;
+							} catch (e) {
+							}
+						} }/>
 					</IonItem>
 				</IonList>
 			</IonContent>
