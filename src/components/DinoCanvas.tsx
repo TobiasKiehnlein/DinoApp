@@ -1,13 +1,13 @@
-import React, { FC, ReactNode, Suspense, useEffect, useRef, useState } from 'react';
-import { Canvas, extend, useFrame, useLoader, useThree } from '@react-three/fiber';
+import React, { FC, Suspense, useEffect, useRef, useState } from 'react';
+import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import { Html, OrbitControls, useProgress } from '@react-three/drei';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 
 import './DinoCanvas.scss';
+import DinoModel from './DinoModel';
 
 extend({ EffectComposer, RenderPass, UnrealBloomPass });
 
@@ -17,7 +17,7 @@ function Loader() {
 }
 
 function Dino(props: JSX.IntrinsicElements['mesh']) {
-	const geom = useLoader(FBXLoader, 'dino.fbx');
+	// const geom = useLoader(GLTFLoader, 'dino.glb');
 	const ref = useRef<THREE.Mesh>(null!);
 	const [ hovered, hover ] = useState(false);
 	// useFrame((state, delta) => (ref.current.rotation.y += 0.005));
@@ -25,12 +25,12 @@ function Dino(props: JSX.IntrinsicElements['mesh']) {
 		<mesh
 			{ ...props }
 			ref={ ref }
-			scale={ 0.0008 }
+			scale={ 0.08 }
 			onPointerOver={ (event) => hover(true) }
 			onPointerOut={ (event) => hover(false) }>
-			<primitive object={ geom }/>
-			{/*<boxGeometry args={ [ 1, 1, 1 ] }/>*/ }
-			<meshPhongMaterial color='green' opacity={ 0.1 } transparent/>
+			<DinoModel/>
+			{/*<primitive object={ geom }/>*/ }
+			{/*<meshPhongMaterial color='green' opacity={ 0.1 } transparent/>*/ }
 		</mesh>
 	);
 }
@@ -42,10 +42,8 @@ function deg2rad(deg: number) {
 const Bloom: FC<{ active?: boolean }> = ({ children, active }) => {
 	const { gl, camera, size } = useThree();
 	const [ scene, setScene ] = useState();
-	const composer = useRef<ReactNode>(null);
-	// @ts-ignore
+	const composer = useRef<any>(null);
 	useEffect(() => void scene && composer.current?.setSize(size.width, size.height), [ size ]);
-	// @ts-ignore
 	useFrame(() => scene && composer.current?.render(), 1);
 	return (
 		<>
@@ -54,7 +52,7 @@ const Bloom: FC<{ active?: boolean }> = ({ children, active }) => {
 			<effectComposer ref={ composer } args={ [ gl ] }>
 				<renderPass attachArray='passes' scene={ scene } camera={ camera }/>
 				{/*@ts-ignore*/ }
-				<unrealBloomPass attachArray='passes' args={ [ undefined, 1.5, 1, 0 ] }/>
+				<unrealBloomPass attachArray='passes' args={ [ undefined, .5, .5, 0 ] }/>
 			</effectComposer>
 		</>
 	);
@@ -62,20 +60,16 @@ const Bloom: FC<{ active?: boolean }> = ({ children, active }) => {
 
 const DinoCanvasContent: React.FC = () => {
 	
-	useThree(({ camera }) => {
+	useThree(({ camera, scene }) => {
 		camera.rotation.set(deg2rad(-35), 0, 0);
 		camera.position.set(0, 2, 5);
+		// scene.background = null;
 	});
 	
 	return (
 		<>
-			<ambientLight/>
-			<pointLight position={ [ 10, 10, 10 ] }/>
-			{/*<pointLight position={ [ 0, 0, 0 ] } color={ 'red' } intensity={ 10 }/>*/ }
-			{/*<mesh position={ [ 0, 0, 0 ] }>*/ }
-			{/*	<boxGeometry args={ [ .1, .1, .1 ] }/>*/ }
-			{/*	<meshStandardMaterial color={ 'hotpink' }/>*/ }
-			{/*</mesh>*/ }
+			<pointLight position={ [ 10, 10, 10 ] } intensity={ .1 }/>
+			<pointLight position={ [ -10, 10, -10 ] } intensity={ .1 }/>
 			<Dino position={ [ 0, -2, 0 ] }/>
 		</>
 	);
@@ -86,9 +80,9 @@ const DinoCanvas: React.FC = () => {
 	return (
 		<Canvas style={ { height: 'min(40vh, 500px)' } } linear id={ 'dino-canvas' }>
 			<Suspense fallback={ <Loader/> }>
-				{/*<Bloom>*/}
+				<Bloom>
 					<DinoCanvasContent/>
-				{/*</Bloom>*/}
+				</Bloom>
 				<OrbitControls autoRotate enableZoom={ false } enablePan={ false }/>
 			</Suspense>
 		</Canvas>
