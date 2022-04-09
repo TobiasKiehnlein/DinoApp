@@ -4,6 +4,9 @@
 	"private": true,
 	"homepage": "https://tobiaskiehnlein.github.io/",
 	"dependencies": {
+		"glslify": "^6.1.0",
+		"glsl-noise": "0.0.0",
+		"glsl-pi": "^1.0.0",
 		"@capacitor/core": "3.1.2",
 		"@ionic/react": "^6.0.2",
 		"@ionic/react-router": "^6.0.2",

@@ -1,0 +1,12 @@
+version: '3'
+
+networks:
+  nginxproxymanager_default:
+    external: true
+
+services:
+  dino-app:
+    image: ghcr.io/tobiaskiehnlein/dinoapp:latest
+    restart: always
+    networks:
+      - nginxproxymanager_default

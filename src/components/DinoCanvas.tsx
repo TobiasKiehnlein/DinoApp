@@ -39,7 +39,7 @@ function deg2rad(deg: number) {
 	return deg * (Math.PI / 180);
 }
 
-const Bloom: FC<{ active?: boolean }> = ({ children, active }) => {
+const Bloom: FC<{ active?: boolean }> = ({ children, active = true }) => {
 	const { gl, camera, size } = useThree();
 	const [ scene, setScene ] = useState();
 	const composer = useRef<any>(null);
@@ -52,7 +52,7 @@ const Bloom: FC<{ active?: boolean }> = ({ children, active }) => {
 			<effectComposer ref={ composer } args={ [ gl ] }>
 				<renderPass attachArray='passes' scene={ scene } camera={ camera }/>
 				{/*@ts-ignore*/ }
-				<unrealBloomPass attachArray='passes' args={ [ undefined, .5, .5, 0 ] }/>
+				{ active && <unrealBloomPass attachArray='passes' args={ [ undefined, .5, .5, 0 ] }/> }
 			</effectComposer>
 		</>
 	);
@@ -80,7 +80,7 @@ const DinoCanvas: React.FC = () => {
 	return (
 		<Canvas style={ { height: 'min(40vh, 500px)' } } linear id={ 'dino-canvas' }>
 			<Suspense fallback={ <Loader/> }>
-				<Bloom>
+				<Bloom active={ false }>
 					<DinoCanvasContent/>
 				</Bloom>
 				<OrbitControls autoRotate enableZoom={ false } enablePan={ false }/>
